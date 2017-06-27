@@ -24,7 +24,7 @@
         module: ec2
         keypair: "{{ keypair }}"
         instance_type: "{{ type | default('t2.micro') }}"
-        vpc_subnet_id: "subnet-{{ vpc_subnet | default('6f4b9b35') }}"
+        vpc_subnet_id: "{{ vpc_subnet | default('subnet-6f4b9b35') }}"
         image: "{{ ami }}"
         region: "{{ region }}"
         count: "{{ count }}"
