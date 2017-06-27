@@ -8,13 +8,16 @@
     region:   us-east-1
     ami:      ami-81cf0c97 
     keypair:  "{{ ec2_keypair_name | default('you need to define this') }}"
-    set_dns:  False
+    set_dns:  True
     count:    1
     tags:
       env:  "{{ tags_env  | default('prod') }}"
       type: "{{ tags_type | default('app') }}"
     wait_for_ssh: False
-
+    max_retries: 9
+    retry_interval: 20
+    provider_id: "99000000000001"  #manually set and found easily using /api/providers
+    
   tasks:
     - name: Launch instance
       local_action:
