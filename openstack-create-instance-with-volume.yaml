@@ -1,0 +1,54 @@
+- name: Launch a compute instance
+  hosts: localhost
+  vars:
+    config_file: "{{ lookup('env', 'OS_CLIENT_CONFIG_FILE') }}"
+  tasks:
+    - stat: path="{{ config_file }}"
+      register: st
+
+    - include_vars: "{{ config_file }}"
+      when: st.stat.exists and st.stat.isreg
+
+    - name: Create Volume
+      os_volume:
+        state: present
+        auth:
+          auth_url: "{{ clouds.devstack.auth.auth_url }}"
+          username: "{{ clouds.devstack.auth.username }}"
+          password: "{{ clouds.devstack.auth.password }}"
+          project_name: "{{ project_name | default('admin') }}"
+        volume_type: "{{ type_storage_name }}"
+        size: "{{ storage_size_name }}"
+        display_name: "{{ display_name_name }}"
+        
+    - name: Launch Instance
+      os_server:
+        state: present
+        auth:
+          auth_url: "{{ clouds.devstack.auth.auth_url }}"
+          username: "{{ clouds.devstack.auth.username }}"
+          password: "{{ clouds.devstack.auth.password }}"
+          project_name: "{{ project_name | default('admin') }}"
+        name: "{{ instance_name | default('noname') }}"
+        region_name: "{{ regionname_name }}"
+        availability_zone: "{{ availabilityzone_name }}"
+        image: "{{ image_name }}"
+        key_name: "{{ keyname }}"
+        timeout: 200
+        flavor: "{{ flavor_name }}"
+        security_groups: "{{ security_name }}"
+        auto_ip: yes
+
+    - name: Attach Volume to Instance
+      os_server_volume:
+        state: present
+        auth:
+          auth_url: "{{ clouds.devstack.auth.auth_url }}"
+          username: "{{ clouds.devstack.auth.username }}"
+          password: "{{ clouds.devstack.auth.password }}"
+          project_name: "{{ project_name | default('admin') }}"
+        volume: "{{ display_name_name | default('noname' )}}"
+        server: "{{ instance_name | default('noname') }}"
+
+
+
